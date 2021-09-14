@@ -83,8 +83,14 @@ async function match({ parentTitle, title, type }) {
   try {
     const url = `https://api.audible.com/1.0/screens/audible-browse/search-ios?content_type=Audiobook&keywords=${encodeURIComponent(title)}%20${encodeURIComponent(parentTitle)}`
     const res = await axios.get(url);
-    if (res.data.sections.length > 0 && res.data.sections[0].model.api_data.result_count.total > 0 ) {
-      return await Promise.all(res.data.sections[0].model.items.map(async item => {
+
+    // Look for a `section` with `items`. We've seen this appear at various positions in the list.
+    let section;
+    if (res.data.sections.length > 0)
+      section = res.data.sections.find(section => { return !!section.model && !!section.model.items && section.model.items.length > 0 });
+
+    if (section && section.model.api_data.result_count.total > 0 ) {
+      return await Promise.all(section.model.items.map(async item => {
         const meta = item.model.product_metadata;
         const { parentTitle, parentRatingKey, originallyAvailableAt } = await update(meta.asin); //TODO: Could avoid extra requests if we can get these w/ search results.
         return({
