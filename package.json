@@ -4,7 +4,8 @@
   "description": "Custom Audible agent.",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodemon ."
+    "start": "node .",
+    "dev": "nodemon ."
   },
   "parentTitle": "ekim1337",
   "license": "MIT",
